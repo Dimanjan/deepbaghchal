@@ -1,7 +1,20 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.getcwd()))
+from board import Board
+brd=Board()
+
 import pygame
 pygame.init()
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 0.7 * SCREEN_WIDTH
+MARGIN={
+    "left": SCREEN_WIDTH*0.35,
+    "right":SCREEN_WIDTH*0.1,
+    "top":SCREEN_HEIGHT*0.1,
+    "bottom": SCREEN_HEIGHT*0.1
+}
+
 from pygame.locals import (
     RLEACCEL,
     K_UP,
@@ -31,32 +44,32 @@ goats = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 
 
-running = True
-clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-picture = pygame.image.load('img/board.svg')
-picture = pygame.transform.scale(picture, (SCREEN_WIDTH, SCREEN_HEIGHT))
-rect = picture.get_rect()
-print(rect)
-
-#rect = rect.move((x, y))
-#screen.blit(picture, rect)
-
-while running:
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                running = False
-        elif event.type == QUIT:
-            running = False
+def main():
     
+    picture = pygame.image.load('img/board.svg')
+    picture = pygame.transform.scale(picture, (SCREEN_WIDTH-MARGIN["left"]-MARGIN["right"], 
+        SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]))
+    rect = picture.get_rect()
+    rect = rect.move((MARGIN["left"], MARGIN["top"]))
+
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(picture, rect)
 
-    # Update the display
-    pygame.display.flip() 
+    clock = pygame.time.Clock()
 
-    # Ensure program maintains a rate of 30 frames per second
-    clock.tick(30)
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+            elif event.type == QUIT:
+                running = False
 
+        pygame.display.flip() 
+        clock.tick(30)
+
+if __name__ == '__main__':
+    main()
