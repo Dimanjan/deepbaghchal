@@ -1,6 +1,6 @@
 
 N_ROWS=5 # Rows in baghchal board
-N_COLUMNS=5 # Columns in baghchal board
+N_COLUMNS=N_ROWS # Columns in baghchal board
 TOTAL_INTERSECTIONS = N_ROWS*N_COLUMNS
 
 # Number of baghs and goat
@@ -27,7 +27,7 @@ PHASES={
 PLACEMENT = TOTAL_GOATS * 2 -1
 
 #action space
-ACTION_SIZE = 337
+ACTION_SIZE = 331
 
 class Conversion:
     def to_coordinate(n): # Examples: 0 = (1,1) ; 1 = (1,2) ; ... ; 9 = (2,5) ; 21 = (5,2)

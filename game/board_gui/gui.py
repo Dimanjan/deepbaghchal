@@ -1,7 +1,12 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(os.getcwd()))
-from board import Board
+from board import *
 brd=Board()
+
+def intToIJ(n):
+    i=n // 5 
+    j=n%5
+    return i,j
 
 import pygame
 pygame.init()
@@ -49,13 +54,20 @@ all_sprites = pygame.sprite.Group()
 def main():
     
     picture = pygame.image.load('img/board.svg')
-    picture = pygame.transform.scale(picture, (SCREEN_WIDTH-MARGIN["left"]-MARGIN["right"], 
-        SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]))
+    boardWidth=SCREEN_WIDTH-MARGIN["left"]-MARGIN["right"]
+    boardHeight=SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]
+    picture = pygame.transform.scale(picture, (boardWidth, boardHeight))
     rect = picture.get_rect()
     rect = rect.move((MARGIN["left"], MARGIN["top"]))
 
+    
+
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(picture, rect)
+    bagh=pygame.image.load('img/bagh.png')
+    baghWidth=boardWidth/
+    screen.blit(b, b.get_rect())
+
 
     clock = pygame.time.Clock()
 
