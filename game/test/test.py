@@ -19,14 +19,8 @@ from pygame.locals import (
 # Load and play background music
 # Sound source: http://ccmixter.org/files/Apoxode/59262
 # License: https://creativecommons.org/licenses/by/3.0/
-pygame.mixer.music.load("Apoxode_-_Electric_1.mp3")
-pygame.mixer.music.play(loops=-1)
-
 # Load all sound files
 # Sound sources: Jon Fincher
-move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
-move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
-collision_sound = pygame.mixer.Sound("Collision.ogg")
 
 
 # Define constants for the screen width and height
@@ -48,10 +42,8 @@ class Player(pygame.sprite.Sprite):
     def update(self, pressed_keys):
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -MOVE_MAG)
-            move_up_sound.play()
         if pressed_keys[K_DOWN]:
             self.rect.move_ip(0, MOVE_MAG)
-            move_down_sound.play()
         if pressed_keys[K_LEFT]:
             self.rect.move_ip(-MOVE_MAG, 0)
         if pressed_keys[K_RIGHT]:
@@ -192,11 +184,6 @@ while running:
     if pygame.sprite.spritecollideany(player, enemies):
         # If so, then remove the player and stop the loop
         player.kill()
-
-        # Stop any moving sounds and play the collision sound
-        move_up_sound.stop()
-        move_down_sound.stop()
-        collision_sound.play()
 
         running = False
 
