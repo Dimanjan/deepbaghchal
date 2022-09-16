@@ -145,7 +145,7 @@ def simulate_game(n_moves):
             return np.array(b.victor),np.array(b.history['positions'])
 
 simulate_game(51)
-print(b.bagh_occupancy)
+print(b.turn)
 
 
 #def moveCoder():
@@ -156,29 +156,25 @@ def dropPiece():
         move_code=GOAT_LETTER
     else:
         move_code=BAGH_LETTER
-    fromSq=str(dragDict["index"])
+    fromSq=f'{dragDict["index"]:02d}'
     mx,my=pygame.mouse.get_pos()
     toSq=xyToInd(mx,my)
     if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
         return
     toSq=f"{toSq:02d}"  
     
-    if len(toSq)==1:
-        toSq='0'+toSq
+
+    print(toSq,fromSq)
     move_code=move_code+toSq+fromSq
     if b.turn == BAGH_NUMBER:
         difference=abs(int(fromSq)-int(toSq))
-        if difference == 1 and difference !=5 and difference!= 6:
+        if difference != 1 and difference !=5 and difference!= 6:
             for d1 in JUMP_CONNECTIONS[int(fromSq)]:
-                for d2 in JUMP_CONNECTIONS[int(toSq)]:
-                    if d1["jump_over"]==d2["jump_over"]:
-                        #then there is a jump move
-                        jump= f'{d1["jump_over"]:02d}'
-                        move_code+=jump
-
-                    
-
-
+                if d1["jump_destination"]==int(toSq):
+                    jump= f'{d1["jump_over"]:02d}'
+                    print('jump',jump)
+                    move_code+=jump
+    print(move_code,b.legal_moves)
     if move_code in b.legal_moves:
         b.make_move(move_code)
 
@@ -214,21 +210,20 @@ def main():
                     if index in b.bagh_occupancy and b.turn==BAGH_NUMBER:
                         print('dragging bagh')
                         dragDict["piece"]=BAGH_NUMBER
-                        dragDict["drag"]=True  
-
+                        dragDict["drag"]=True
+                        dragDict["index"]=index
                     if index in b.goat_occupancy and b.turn==GOAT_NUMBER: #phase == movement
                         print('dragging goat')
-
                         dragDict["piece"]=GOAT_NUMBER
                         dragDict["drag"]=True  
-                    dragDict["index"]=index
+                        dragDict["index"]=index
             # elif event.type == pygame.MOUSEMOTION:
             #     if dragDict["drag"]:
             #         dragPiece()
             elif event.type == pygame.MOUSEBUTTONUP:
+                dropPiece()
                 dragDict["drag"]=False
                 dragDict["index"]=100
-                dropPiece()
 
         pygame.display.flip() 
         clock.tick(20)
