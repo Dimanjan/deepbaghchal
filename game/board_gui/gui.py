@@ -32,12 +32,15 @@ screen.fill((255,255,255))
 
 MARGIN={
     "left": SCREEN_WIDTH*0.35,
-    "right":SCREEN_WIDTH*0.1,
-    "top":SCREEN_HEIGHT*0.1,
-    "bottom": SCREEN_HEIGHT*0.1
+    "right":SCREEN_WIDTH*0.14,
+    "top":SCREEN_HEIGHT*0.14,
+    "bottom": SCREEN_HEIGHT*0.14
 }
 boardWidth=SCREEN_WIDTH-MARGIN["left"]-MARGIN["right"]
 boardHeight=SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]
+
+squareWidth=boardWidth/4
+squareHeight=boardHeight/4
 
 def drawBoard():
     picture = pygame.image.load('img/board.svg')
@@ -82,8 +85,8 @@ bagh=Bagh()
 
 def drawBagh(sq):
     i,j=indToIJ(sq)
-    i=4-i
-    j=4-j
+    # i=4-i
+    # j=4-j
     bagh=Bagh()
     x=MARGIN["left"]+i*boardWidth/4 - baghWidth/2
     y=MARGIN["top"]+j*boardHeight/4 - baghHeight/2
@@ -91,8 +94,8 @@ def drawBagh(sq):
 
 def drawGoat(sq):
     i,j=indToIJ(sq)
-    i=4-i
-    j=4-j
+    # i=4-i
+    # j=4-j
     goat=Goat()
     x=MARGIN["left"]+i*boardWidth/4 - goatWidth/2
     y=MARGIN["top"]+j*boardHeight/4 - goatHeight/2
@@ -116,12 +119,12 @@ def simulate_game(n_moves):
         if b.game_end==True:
             return np.array(b.victor),np.array(b.history['positions'])
 
-simulate_game(52)
+simulate_game(51)
 
 dragDict={
     "drag":False,
     "piece":BAGH_NUMBER,
-    "index":0,
+    "index":100,
 }
 
 def dragPiece():
@@ -169,9 +172,6 @@ def dropPiece():
 
 
 def main():
-
-    
-
     clock = pygame.time.Clock()
 
     running = True
@@ -179,9 +179,11 @@ def main():
         screen.fill((255,255,255))
         drawBoard()
         for sq in b.bagh_occupancy:
-            drawBagh(sq)
+            if sq!= dragDict["index"]:
+                drawBagh(sq)
         for sq in b.goat_occupancy:
-            drawGoat(sq)
+            if sq!= dragDict["index"]:
+                drawGoat(sq)
         dragPiece()
 
 
@@ -196,11 +198,17 @@ def main():
                 if event.button == 1:
                     mx,my=pygame.mouse.get_pos()
                     index=xyToInd(mx,my)
+                    print(index)
                     if index in b.bagh_occupancy and b.turn==BAGH_NUMBER:
+                        print('dragging bagh')
                         dragDict["piece"]=BAGH_NUMBER
+                        dragDict["drag"]=True  
+
                     if index in b.goat_occupancy and b.turn==GOAT_NUMBER: #phase == movement
+                        print('dragging goat')
+
                         dragDict["piece"]=GOAT_NUMBER
-                    dragDict["drag"]=True
+                        dragDict["drag"]=True  
                     dragDict["index"]=index
             # elif event.type == pygame.MOUSEMOTION:
             #     if dragDict["drag"]:
