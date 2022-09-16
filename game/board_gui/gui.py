@@ -6,20 +6,24 @@ from board import *
 brd=Board()
 
 def indToIJ(n):
-    i=n // 5 
-    j=n%5
+    j=n // 5 
+    i=n%5
     return i,j
 
 def ijToInd(i,j):
+    if i>4 or j>4:
+        return 100
     return int(j*5 + i)
 
 def xyToInd(x,y):
-    i=x-MARGIN["left"]
-    i=int((i/(boardWidth) ) * 5)
+    dx=x-MARGIN["left"]+squareWidth/2
+    i=int((dx//(squareWidth) ) )
 
-    j= y-MARGIN["top"]
-    j=int((j/boardHeight)*5)
+    dy= y-MARGIN["top"]+squareHeight/2
+    j=int((dy//squareHeight))
 
+    if i>4 or j>4:
+        return 100
     return ijToInd(i,j)
 
 import pygame
@@ -30,11 +34,14 @@ SCREEN_HEIGHT = 0.7 * SCREEN_WIDTH
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen.fill((255,255,255))
 
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 0.7 * SCREEN_WIDTH
+
 MARGIN={
-    "left": SCREEN_WIDTH*0.35,
-    "right":SCREEN_WIDTH*0.14,
-    "top":SCREEN_HEIGHT*0.14,
-    "bottom": SCREEN_HEIGHT*0.14
+    "left": SCREEN_WIDTH*0.38,
+    "right":SCREEN_WIDTH*0.2,
+    "top":SCREEN_HEIGHT*0.2,
+    "bottom": SCREEN_HEIGHT*0.2
 }
 boardWidth=SCREEN_WIDTH-MARGIN["left"]-MARGIN["right"]
 boardHeight=SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]
@@ -101,6 +108,24 @@ def drawGoat(sq):
     y=MARGIN["top"]+j*boardHeight/4 - goatHeight/2
     goat.update(x,y)
 
+dragDict={
+    "drag":False,
+    "piece":BAGH_NUMBER,
+    "index":100,
+}
+
+def dragPiece():
+    if dragDict["drag"]:
+        mx,my=pygame.mouse.get_pos()
+        if dragDict["piece"]==GOAT_NUMBER:
+            piece=Goat()
+            mx,my=mx-goatWidth/2,my-goatHeight/2
+        else:
+            piece=Bagh()
+            mx,my=mx-baghWidth/2,my-baghHeight/2
+        piece.update(mx,my)
+
+
 import numpy as np
 
 import random
@@ -120,21 +145,8 @@ def simulate_game(n_moves):
             return np.array(b.victor),np.array(b.history['positions'])
 
 simulate_game(51)
+print(b.bagh_occupancy)
 
-dragDict={
-    "drag":False,
-    "piece":BAGH_NUMBER,
-    "index":100,
-}
-
-def dragPiece():
-    if dragDict["drag"]:
-        mx,my=pygame.mouse.get_pos()
-        if dragDict["piece"]==GOAT_NUMBER:
-            piece=Goat()
-        else:
-            piece=Bagh()
-        piece.update(mx,my)
 
 #def moveCoder():
     
@@ -219,7 +231,7 @@ def main():
                 dropPiece()
 
         pygame.display.flip() 
-        clock.tick(5)
+        clock.tick(20)
 
 if __name__ == '__main__':
     main()
