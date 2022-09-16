@@ -1,6 +1,4 @@
 import sys, os
-from tkinter import N
-from turtle import Screen, width
 sys.path.insert(0, os.path.dirname(os.getcwd()))
 from board import *
 brd=Board()
@@ -37,6 +35,10 @@ screen.fill((255,255,255))
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 0.7 * SCREEN_WIDTH
 
+REM_GOAT={
+    'drag':False
+}
+
 MARGIN={
     "left": SCREEN_WIDTH*0.38,
     "right":SCREEN_WIDTH*0.2,
@@ -48,6 +50,9 @@ boardHeight=SCREEN_HEIGHT-MARGIN["top"]-MARGIN["bottom"]
 
 squareWidth=boardWidth/4
 squareHeight=boardHeight/4
+
+remainingGoatX=SCREEN_WIDTH*0.12
+remainingGoatY=SCREEN_HEIGHT*0.5
 
 def drawBoard():
     picture = pygame.image.load('img/board.svg')
@@ -125,6 +130,74 @@ def dragPiece():
             mx,my=mx-baghWidth/2,my-baghHeight/2
         piece.update(mx,my)
 
+def dropPiece():
+    move_code=''
+    if dragDict["piece"]==GOAT_NUMBER:
+        move_code=GOAT_LETTER
+    else:
+        move_code=BAGH_LETTER
+    fromSq=f'{dragDict["index"]:02d}'
+    mx,my=pygame.mouse.get_pos()
+    toSq=xyToInd(mx,my)
+    if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
+        return
+    toSq=f"{toSq:02d}"  
+    
+    move_code=move_code+toSq+fromSq
+
+    #check if its a jump move by bagh
+    if b.turn == BAGH_NUMBER and dragDict["piece"]==BAGH_NUMBER:
+        difference=abs(int(fromSq)-int(toSq))
+        if difference != 1 and difference !=5 and difference!= 6:
+            for d1 in JUMP_CONNECTIONS[int(fromSq)]:
+                if d1["jump_destination"]==int(toSq):
+                    jump= f'{d1["jump_over"]:02d}'
+                    move_code+=jump
+    if move_code in b.legal_moves:
+        b.make_move(move_code)
+
+
+
+def drawRemainingGoats():
+    remaining_goats=20-b.captured_goats-len(b.goat_occupancy)
+    if remaining_goats > 1 or (remaining_goats==1 and not REM_GOAT['drag']):
+        goat=Goat()
+        goat.update(remainingGoatX,remainingGoatY)
+
+    pygame.font.init() 
+    my_font = pygame.font.SysFont('Comic Sans MS', 30)
+    text_surface = my_font.render('Remaining Goats '+ str(remaining_goats), False, (0, 0, 0))
+    screen.blit(text_surface, (remainingGoatX*0.4,remainingGoatY*1.2))
+
+def isRemGoatDrag(mx,my):
+    if b.phase==PHASES["PLACEMENT"] and mx > (remainingGoatX - goatWidth*0.2) and mx < (remainingGoatX + goatWidth*1.2) and my > (remainingGoatY - goatWidth*0.2)  and my < (remainingGoatY + goatHeight*1.2):
+        return True
+    else:
+        return False
+def dragFromRemainingGoats():
+    
+    if REM_GOAT['drag']:
+        mx,my=pygame.mouse.get_pos()
+        goat=Goat()
+        
+        mx,my=mx-goatWidth/2,my-goatHeight/2
+        print(mx,my)
+        goat.update(mx,my)
+
+
+def dropFromRemainingGoats():
+    if REM_GOAT['drag']:
+        mx,my=pygame.mouse.get_pos()
+        toSq=xyToInd(mx,my)
+        if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
+            return
+        toSq=f"{toSq:02d}"
+        move_code='G'+toSq
+        if move_code in b.legal_moves:
+            b.make_move(move_code)
+        REM_GOAT['drag']=False
+
+
 
 import numpy as np
 
@@ -144,44 +217,11 @@ def simulate_game(n_moves):
         if b.game_end==True:
             return np.array(b.victor),np.array(b.history['positions'])
 
-simulate_game(51)
+simulate_game(20)
 print(b.turn)
-
-
-#def moveCoder():
-    
-def dropPiece():
-    move_code=''
-    if dragDict["piece"]==GOAT_NUMBER:
-        move_code=GOAT_LETTER
-    else:
-        move_code=BAGH_LETTER
-    fromSq=f'{dragDict["index"]:02d}'
-    mx,my=pygame.mouse.get_pos()
-    toSq=xyToInd(mx,my)
-    if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
-        return
-    toSq=f"{toSq:02d}"  
-    
-
-    print(toSq,fromSq)
-    move_code=move_code+toSq+fromSq
-    if b.turn == BAGH_NUMBER:
-        difference=abs(int(fromSq)-int(toSq))
-        if difference != 1 and difference !=5 and difference!= 6:
-            for d1 in JUMP_CONNECTIONS[int(fromSq)]:
-                if d1["jump_destination"]==int(toSq):
-                    jump= f'{d1["jump_over"]:02d}'
-                    print('jump',jump)
-                    move_code+=jump
-    print(move_code,b.legal_moves)
-    if move_code in b.legal_moves:
-        b.make_move(move_code)
-
 
 def main():
     clock = pygame.time.Clock()
-
     running = True
     while running:
         screen.fill((255,255,255))
@@ -193,6 +233,8 @@ def main():
             if sq!= dragDict["index"]:
                 drawGoat(sq)
         dragPiece()
+        drawRemainingGoats()
+        dragFromRemainingGoats()
 
 
         for event in pygame.event.get():
@@ -212,18 +254,27 @@ def main():
                         dragDict["piece"]=BAGH_NUMBER
                         dragDict["drag"]=True
                         dragDict["index"]=index
-                    if index in b.goat_occupancy and b.turn==GOAT_NUMBER: #phase == movement
+                    if index in b.goat_occupancy and b.turn==GOAT_NUMBER and b.phase == PHASES["MOVEMENT"]:
                         print('dragging goat')
                         dragDict["piece"]=GOAT_NUMBER
                         dragDict["drag"]=True  
-                        dragDict["index"]=index
+                        dragDict["index"]=index 
+
+                    if isRemGoatDrag(mx,my):
+                        REM_GOAT['drag']=True
+                        dragFromRemainingGoats()
+
+
             # elif event.type == pygame.MOUSEMOTION:
             #     if dragDict["drag"]:
             #         dragPiece()
             elif event.type == pygame.MOUSEBUTTONUP:
-                dropPiece()
+                if dragDict["drag"]:
+                    dropPiece()
                 dragDict["drag"]=False
                 dragDict["index"]=100
+
+                dropFromRemainingGoats()
 
         pygame.display.flip() 
         clock.tick(20)
