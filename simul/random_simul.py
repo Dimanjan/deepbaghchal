@@ -1,7 +1,7 @@
 
 from pathlib import Path
-import sys
-sys.path.insert(0, str(Path().absolute())+'/game')
+import sys,os
+sys.path.insert(0, os.path.dirname(os.getcwd())+'/game')
 from board import Board
 
 
@@ -22,6 +22,7 @@ def simulate_game():
     b.make_move(choosen_move)
 
     if b.game_end==True:
-      return np.array(b.victor),np.array(b.history['positions'])
+      return b.history['pgn']
+      
 
 simulate_game()
