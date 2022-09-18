@@ -4,7 +4,7 @@ from board import *
 brd=Board()
 
 def indToIJ(n):
-    j=n // 5 
+    j=n // 5
     i=n%5
     return i,j
 
@@ -56,7 +56,7 @@ remainingGoatY=SCREEN_HEIGHT*0.3
 
 def drawBoard():
     picture = pygame.image.load('img/board.svg')
-    
+
     picture = pygame.transform.scale(picture, (boardWidth, boardHeight))
     #rect = picture.get_rect()
     #rect = rect.move((MARGIN["left"], MARGIN["top"]))
@@ -141,8 +141,8 @@ def dropPiece():
     toSq=xyToInd(mx,my)
     if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
         return
-    toSq=f"{toSq:02d}"  
-    
+    toSq=f"{toSq:02d}"
+
     move_code=move_code+toSq+fromSq
 
     #check if its a jump move by bagh
@@ -157,7 +157,7 @@ def dropPiece():
         b.make_move(move_code)
 
 
-pygame.font.init() 
+pygame.font.init()
 
 game_end_font_size=int(SCREEN_WIDTH * 0.04)
 game_end_font = pygame.font.SysFont('Comic Sans MS', game_end_font_size)
@@ -208,11 +208,11 @@ def isRemGoatDrag(mx,my):
     else:
         return False
 def dragFromRemainingGoats():
-    
+
     if REM_GOAT['drag']:
         mx,my=pygame.mouse.get_pos()
         goat=Goat()
-        
+
         mx,my=mx-goatWidth/2,my-goatHeight/2
         goat.update(mx,my)
 
@@ -228,90 +228,87 @@ def dropFromRemainingGoats():
         if move_code in b.legal_moves:
             b.make_move(move_code)
         REM_GOAT['drag']=False
-
-
-
-import numpy as np
-
-import random
-def random_chooser(lst):
-  return random.choice(lst)
-
 b=Board()
-def simulate_game(n_moves):
-    count=0
-    while n_moves>count:
-        count+=1
-        available_moves=b.legal_moves
-        choosen_move=random_chooser(available_moves)
-        b.make_move(choosen_move)
 
-        if b.game_end==True:
-            return np.array(b.victor),np.array(b.history['positions'])
 
-simulate_game(20)
+
+# import numpy as np
+
+# import random
+# def random_chooser(lst):
+#   return random.choice(lst)
+
+# def simulate_game(n_moves):
+#     count=0
+#     while n_moves>count:
+#         count+=1
+#         available_moves=b.legal_moves
+#         choosen_move=random_chooser(available_moves)
+#         b.make_move(choosen_move)
+
+#         if b.game_end==True:
+#             return np.array(b.victor),np.array(b.history['positions'])
+
+def screenDraw():
+    screen.fill((255,255,255))
+    drawBoard()
+    for sq in b.bagh_occupancy:
+        if sq!= dragDict["index"]:
+            drawBagh(sq)
+    for sq in b.goat_occupancy:
+        if sq!= dragDict["index"]:
+            drawGoat(sq)
+    dragPiece()
+    updateDetails()
+    dragFromRemainingGoats()
+
+GAME={
+    'running':True
+}
+def evenHandler():
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                GAME["running"] = False
+        elif event.type == QUIT:
+            GAME["running"] = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                mx,my=pygame.mouse.get_pos()
+                index=xyToInd(mx,my)
+                if index in b.bagh_occupancy and b.turn==BAGH_NUMBER:
+                    dragDict["piece"]=BAGH_NUMBER
+                    dragDict["drag"]=True
+                    dragDict["index"]=index
+                if index in b.goat_occupancy and b.turn==GOAT_NUMBER and b.phase == PHASES["MOVEMENT"]:
+                    dragDict["piece"]=GOAT_NUMBER
+                    dragDict["drag"]=True
+                    dragDict["index"]=index
+
+                if isRemGoatDrag(mx,my):
+                    REM_GOAT['drag']=True
+                    dragFromRemainingGoats()
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if dragDict["drag"]:
+                dropPiece()
+            dragDict["drag"]=False
+            dragDict["index"]=100
+
+            dropFromRemainingGoats()
 
 def main():
-    clock = pygame.time.Clock()
-    running = True
+    #simulate_game(20)
     
-    while running:
-        #if not b.game_end:
-        screen.fill((255,255,255))
-        drawBoard()
-        for sq in b.bagh_occupancy:
-            if sq!= dragDict["index"]:
-                drawBagh(sq)
-        for sq in b.goat_occupancy:
-            if sq!= dragDict["index"]:
-                drawGoat(sq)
-        dragPiece()
-        updateDetails()
-        dragFromRemainingGoats()
-
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    running = False
-            elif event.type == QUIT:
-                running = False
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    mx,my=pygame.mouse.get_pos()
-                    index=xyToInd(mx,my)
-                    if index in b.bagh_occupancy and b.turn==BAGH_NUMBER:
-                        dragDict["piece"]=BAGH_NUMBER
-                        dragDict["drag"]=True
-                        dragDict["index"]=index
-                    if index in b.goat_occupancy and b.turn==GOAT_NUMBER and b.phase == PHASES["MOVEMENT"]:
-                        dragDict["piece"]=GOAT_NUMBER
-                        dragDict["drag"]=True  
-                        dragDict["index"]=index 
-
-                    if isRemGoatDrag(mx,my):
-                        REM_GOAT['drag']=True
-                        dragFromRemainingGoats()
-
-
-            # elif event.type == pygame.MOUSEMOTION:
-            #     if dragDict["drag"]:
-            #         dragPiece()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if dragDict["drag"]:
-                    dropPiece()
-                dragDict["drag"]=False
-                dragDict["index"]=100
-
-                dropFromRemainingGoats()
-            
-
-        
-
-        pygame.display.flip() 
+    clock = pygame.time.Clock()
+    while GAME["running"]:
+        screenDraw()
+        evenHandler()
+        pygame.display.flip()
         clock.tick(20)
 
-        
+
 
 if __name__ == '__main__':
     main()
