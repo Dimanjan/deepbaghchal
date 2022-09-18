@@ -52,7 +52,7 @@ squareWidth=boardWidth/4
 squareHeight=boardHeight/4
 
 remainingGoatX=SCREEN_WIDTH*0.12
-remainingGoatY=SCREEN_HEIGHT*0.5
+remainingGoatY=SCREEN_HEIGHT*0.3
 
 def drawBoard():
     picture = pygame.image.load('img/board.svg')
@@ -157,20 +157,53 @@ def dropPiece():
         b.make_move(move_code)
 
 
+pygame.font.init() 
 
-def drawRemainingGoats():
+game_end_font_size=int(SCREEN_WIDTH * 0.04)
+game_end_font = pygame.font.SysFont('Comic Sans MS', game_end_font_size)
+
+def updateDetails():
+    #Remaining Goats
     remaining_goats=20-b.captured_goats-len(b.goat_occupancy)
     if remaining_goats > 1 or (remaining_goats==1 and not REM_GOAT['drag']):
         goat=Goat()
         goat.update(remainingGoatX,remainingGoatY)
 
-    pygame.font.init() 
-    my_font = pygame.font.SysFont('Comic Sans MS', 30)
-    text_surface = my_font.render('Remaining Goats '+ str(remaining_goats), False, (0, 0, 0))
-    screen.blit(text_surface, (remainingGoatX*0.4,remainingGoatY*1.2))
+    font_size=int(SCREEN_HEIGHT*0.04)
+    my_font = pygame.font.SysFont('Comic Sans MS', font_size)
+    text_surface = my_font.render('Remaining Goats: '+ str(remaining_goats), False, (0, 0, 0))
+    screen.blit(text_surface, (remainingGoatX*0.4,remainingGoatY+ 2*font_size))
+
+    # Captured Goats
+    text_surface = my_font.render('Captured Goats: '+ str(b.captured_goats), False, (0, 0, 0))
+    screen.blit(text_surface, (remainingGoatX*0.4,remainingGoatY+4*font_size))
+
+    # PHASE
+    if b.phase==PHASES["PLACEMENT"]:
+        phase='Placement'
+    else:
+        phase='Movement'
+    text_surface = my_font.render('Phase: '+ phase, False, (0, 0, 0))
+    screen.blit(text_surface, (remainingGoatX*0.4,remainingGoatY+6*font_size))
+
+    # Turn
+    if b.turn==BAGH_NUMBER:
+        turn='BAGH'
+    else:
+        turn='goat'
+    text_surface = my_font.render('Turn: '+ turn, False, (0, 0, 0))
+    screen.blit(text_surface, (remainingGoatX*0.6,remainingGoatY+8*font_size))
+
+    if b.game_end:
+        if b.victor==BAGH_NUMBER:
+            winner='BAGH'
+        elif b.victor==GOAT_NUMBER:
+            winner='goat'
+        game_end_text = game_end_font.render('Winner: '+ winner, False, (0, 0, 0))
+        screen.blit(game_end_text, (SCREEN_WIDTH*0.3,SCREEN_HEIGHT*0.4))
 
 def isRemGoatDrag(mx,my):
-    if b.phase==PHASES["PLACEMENT"] and mx > (remainingGoatX - goatWidth*0.2) and mx < (remainingGoatX + goatWidth*1.2) and my > (remainingGoatY - goatWidth*0.2)  and my < (remainingGoatY + goatHeight*1.2):
+    if b.turn==GOAT_NUMBER and b.phase==PHASES["PLACEMENT"] and mx > (remainingGoatX - goatWidth*0.2) and mx < (remainingGoatX + goatWidth*1.2) and my > (remainingGoatY - goatWidth*0.2)  and my < (remainingGoatY + goatHeight*1.2):
         return True
     else:
         return False
@@ -181,7 +214,6 @@ def dragFromRemainingGoats():
         goat=Goat()
         
         mx,my=mx-goatWidth/2,my-goatHeight/2
-        print(mx,my)
         goat.update(mx,my)
 
 
@@ -218,12 +250,13 @@ def simulate_game(n_moves):
             return np.array(b.victor),np.array(b.history['positions'])
 
 simulate_game(20)
-print(b.turn)
 
 def main():
     clock = pygame.time.Clock()
     running = True
+    
     while running:
+        #if not b.game_end:
         screen.fill((255,255,255))
         drawBoard()
         for sq in b.bagh_occupancy:
@@ -233,9 +266,8 @@ def main():
             if sq!= dragDict["index"]:
                 drawGoat(sq)
         dragPiece()
-        drawRemainingGoats()
+        updateDetails()
         dragFromRemainingGoats()
-
 
         for event in pygame.event.get():
             if event.type == KEYDOWN:
@@ -248,14 +280,11 @@ def main():
                 if event.button == 1:
                     mx,my=pygame.mouse.get_pos()
                     index=xyToInd(mx,my)
-                    print(index)
                     if index in b.bagh_occupancy and b.turn==BAGH_NUMBER:
-                        print('dragging bagh')
                         dragDict["piece"]=BAGH_NUMBER
                         dragDict["drag"]=True
                         dragDict["index"]=index
                     if index in b.goat_occupancy and b.turn==GOAT_NUMBER and b.phase == PHASES["MOVEMENT"]:
-                        print('dragging goat')
                         dragDict["piece"]=GOAT_NUMBER
                         dragDict["drag"]=True  
                         dragDict["index"]=index 
@@ -275,9 +304,14 @@ def main():
                 dragDict["index"]=100
 
                 dropFromRemainingGoats()
+            
+
+        
 
         pygame.display.flip() 
         clock.tick(20)
+
+        
 
 if __name__ == '__main__':
     main()

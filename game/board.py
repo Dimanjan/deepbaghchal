@@ -232,6 +232,9 @@ class Board:
       self.goat_victory()
       self.is_draw()
 
+      if self.game_end:
+        self.legal_moves=[]
+
     def move_bagh(self,move):
         if move[0]==BAGH_LETTER:
             self.remove_bagh(int(move[3:5]))
