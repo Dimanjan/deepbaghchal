@@ -1,7 +1,7 @@
 
 import  sys, os
 sys.path.insert(0, os.path.dirname(os.getcwd()))
-from board import *
+from boardLogic import *
 brd=Board()
 
 import pygame
