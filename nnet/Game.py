@@ -1,6 +1,7 @@
+import re
 import  sys, os
 
-from game.boardLogic import N_COLUMNS, N_ROWS, Board
+from game.boardLogic import BAGH_NUMBER, N_COLUMNS, N_ROWS, Board
 sys.path.insert(0, os.path.dirname(os.getcwd())+'\\game')
 from boardLogic import *
 
@@ -39,7 +40,7 @@ class Game():
         Returns:
             actionSize: number of all possible actions
         """
-        return 331 # only true for 5*5 board
+        return 331 # only for 5*5 board
 
     def getNextState(self, board, player, action):
         """
@@ -52,8 +53,9 @@ class Game():
             nextBoard: board after applying action
             nextPlayer: player who plays in the next turn (should be -player)
         """
-        
-        pass
+        if action in board.legal_moves:
+            board.make_move(action)
+        return (board,-player)
 
     def getValidMoves(self, board, player):
         """
@@ -66,7 +68,12 @@ class Game():
                         moves that are valid from the current board and player,
                         0 for invalid moves
         """
-        pass
+        if len(board.legal_moves)==0:
+            if board.turn==BAGH_NUMBER:
+                return np.in1d(board.action_space, ['nomovebagh'])
+            else:
+                return np.in1d(board.action_space, ['nomovegoat'])
+        return np.in1d(board.action_space, board.legal_moves)
 
     def getGameEnded(self, board, player):
         """
@@ -79,7 +86,14 @@ class Game():
                small non-zero value for draw.
                
         """
-        pass
+        if not board.game_end:
+            return 0
+        if board.draw:
+            return 0.0000001
+        if board.victor==board.turn:
+            return 1
+        else:
+            return -1
 
     def getCanonicalForm(self, board, player):
         """
@@ -95,7 +109,7 @@ class Game():
                             board as is. When the player is black, we can invert
                             the colors and return the board.
         """
-        pass
+        return board.turn*np.array(board.board_array) #+[board.turn,board.phase])
 
     def getSymmetries(self, board, pi):
         """
@@ -108,7 +122,8 @@ class Game():
                        form of the board and the corresponding pi vector. This
                        is used when training the neural network from examples.
         """
-        pass
+        nr=np.reshape(board.board_array,(N_ROWS,N_COLUMNS))
+        return [(nr,0),(np.fliplr(nr),1),(np.flip(nr),2),(np.flipud(nr),2)] #sends 2d but 1 maybe?
 
     def stringRepresentation(self, board):
         """
@@ -119,4 +134,4 @@ class Game():
             boardString: a quick conversion of board to a string format.
                          Required by MCTS for hashing.
         """
-        pass
+        return board.position_string
