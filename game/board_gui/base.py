@@ -1,6 +1,6 @@
 
-import  sys, os
-sys.path.insert(0, os.path.dirname(os.getcwd()))
+import  sys
+sys.path.append('..')
 from boardLogic import *
 brd=Board()
 

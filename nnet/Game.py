@@ -1,9 +1,9 @@
 import re
-import  sys, os
 
-from game.boardLogic import BAGH_NUMBER, N_COLUMNS, N_ROWS, Board
-sys.path.insert(0, os.path.dirname(os.getcwd())+'\\game')
-from boardLogic import *
+import  sys
+sys.path.append('..')
+from game.boardLogic import *
+print(N_COLUMNS)
 
 import numpy as np
 class Game():
