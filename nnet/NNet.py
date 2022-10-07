@@ -12,7 +12,7 @@ from NeuralNet import NeuralNet
 
 import argparse
 
-from .BagChalNNet import OthelloNNet as onnet
+from .BagChalNNet import BagChalNNet as onnet
 
 args = dotdict({
     'lr': 0.001,

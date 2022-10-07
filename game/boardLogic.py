@@ -88,43 +88,7 @@ def jump_connections():
 CONNECTIONS=connections()
 JUMP_CONNECTIONS=jump_connections()
 
-class Board:
-    def __init__(self):
-        self.board_array=[EMPTY_NUMBER]*TOTAL_INTERSECTIONS
-        self.bagh_occupancy=[0,4,20,24]
-        self.goat_occupancy=[]
-
-        # initialize baghs
-        for square in [0,4,20,24]:
-            self.board_array[square]=BAGH_NUMBER
-
-        self.captured_goats=0
-        self.turn=GOAT_NUMBER
-
-        self.phase=PHASES['PLACEMENT']
-        self.position_string = self.stringify_position()
-
-
-
-        self.history={
-            'positions':[],
-            'pgn':[]
-        }
-        
-
-        self.repetitions={}
-        self.thrice_repetition=False
-
-        self.draw = False
-        self.victor=None
-        self.game_end=False
-
-        self.bagh_moves=self.legal_bagh_moves()
-        self.goat_moves=self.legal_goat_moves()
-        self.legal_moves=[]
-        self.legal_moves_function()
-
-        self.action_space=['G00','G01', 'G02', 'G03','G04', 'G05', 'G06', 'G07', 'G08', 'G09', 'G10',
+ALL_MOVES=['G00','G01', 'G02', 'G03','G04', 'G05', 'G06', 'G07', 'G08', 'G09', 'G10',
        'G11', 'G12', 'G13', 'G14', 'G15', 'G16', 'G17', 'G18', 'G19','G20',
        'G21', 'G22', 'G23','G24',
        'G0500', 'G0100', 'G0600', 'G0601', 'G0001', 'G0201', 'G0702',
@@ -176,18 +140,62 @@ class Board:
        'B222423', 'B122418',
        'nomovebagh']
 
+import numpy as np
+class Board:
+    def __init__(self):
+        self.board_array=np.array([EMPTY_NUMBER]*TOTAL_INTERSECTIONS)
+        self.bagh_occupancy=[0,4,20,24]
+        self.goat_occupancy=[]
+
+        # initialize baghs
+        for square in [0,4,20,24]:
+            self.board_array[square]=BAGH_NUMBER
+
+        self.captured_goats=0
+        self.turn=GOAT_NUMBER
+
+        self.phase=PHASES['PLACEMENT']
+        self.position_string = self.stringify_position()
 
 
-             
+
+        self.history={
+            'positions':[],
+            'pgn':[]
+        }
+        
+
+        self.repetitions={}
+        self.thrice_repetition=False
+
+        self.draw = False
+        self.victor=None
+        self.game_end=False
+
+        self.bagh_moves=self.legal_bagh_moves()
+        self.goat_moves=self.legal_goat_moves()
+        self.legal_moves=[]
+        self.legal_moves_function()
+
+        self.action_space=ALL_MOVES
+
+
+
+    def update_phase(self):
+        if len(self.history['pgn']) >= PLACEMENT:
+            self.phase = PHASES['MOVEMENT']
+            #self.board_array[TOTAL_INTERSECTIONS:]=PHASES['MOVEMENT']
+        else:
+            self.phase = PHASES['PLACEMENT']
+            #self.board_array[TOTAL_INTERSECTIONS:]=PHASES['PLACEMENT']
+
         
 
     def switch_turn(self):
         self.turn = -self.turn
 
-        if len(self.history['pgn']) >= PLACEMENT:
-            self.phase = PHASES['MOVEMENT']
-        else:
-            self.phase = PHASES['PLACEMENT']
+        self.update_phase()
+        
 
     def check_repetitions(self):
         if self.position_string in self.history['positions']:
@@ -208,7 +216,7 @@ class Board:
                 self.thrice_repetition = False #for both 3 and 2
 
     def stringify_position(self):
-        return ''.join(str(i) for i in self.board_array)+str(self.turn)+str(self.phase)
+        return ''.join(str(i) for i in list(self.board_array))+board.phase+board.turn
         
     def put_bagh(self,square):
         self.board_array[square]=BAGH_NUMBER

@@ -3,7 +3,41 @@ import re
 import  sys
 sys.path.append('..')
 from game.boardLogic import *
-print(N_COLUMNS)
+
+a=np.arange(N_COLUMNS*N_ROWS)
+a.shape=(5,5)
+a_ud=np.flipud(a)
+SYMMETRY_MOVES_DCT={}
+S_CODES=['90','180','270','u_0','u_90','u_180','u_270']
+from scipy.ndimage import rotate
+for s_code in S_CODES:
+    #[rotate(a, angle=90),rotate(a, angle=180),rotate(a, angle=270),a_ud,rotate(a_ud, angle=90),rotate(a_ud, angle=180),rotate(a_ud, angle=270)]:
+    a=np.arange(25)
+    a.shape=(5,5)
+    if 'u' in s_code:
+        a=np.flipud(a)
+    a=rotate(a,angle=int(s_code.split('_')[-1]))
+    flat_symmetry=a.flatten()
+    dct={}
+
+    for move in ALL_MOVES:
+        s=str(move)
+        i,j=1,3
+        if move[:2]!='no': # filter nomoves
+            pick=int(move[i:j])
+            s=s[:i] + f"{flat_symmetry[pick]:02}" + s[j:] #f"{a:02}"
+
+            i,j=3,5
+            if move[i:j]: 
+                pick=int(move[i:j])
+                s=s[:i] + f"{flat_symmetry[pick]:02}" + s[j:]
+
+                i,j=5,7
+                if move[i:j]: 
+                    pick=int(move[i:j])
+                    s=s[:i] + f"{flat_symmetry[pick]:02}" + s[j:]
+        dct[s]=move
+    SYMMETRY_MOVES_DCT[s_code]=dct
 
 import numpy as np
 class Game():
@@ -26,7 +60,7 @@ class Game():
                         that will be the input to your neural network)
         """
         b=Board()
-        return np.array(b.board_array)
+        return b
 
     def getBoardSize(self):
         """
@@ -109,9 +143,9 @@ class Game():
                             board as is. When the player is black, we can invert
                             the colors and return the board.
         """
-        return board.turn*np.array(board.board_array) #+[board.turn,board.phase])
+        return np.concatenate(player*np.array(board.board_array) , N_COLUMNS*N_ROWS*[board.phase])
 
-    def getSymmetries(self, board, pi):
+    def getSymmetries(self, board, pi): #does this board also include phase information?
         """
         Input:
             board: current board
@@ -122,9 +156,30 @@ class Game():
                        form of the board and the corresponding pi vector. This
                        is used when training the neural network from examples.
         """
-        nr=np.reshape(board.board_array,(N_ROWS,N_COLUMNS))
-        return [(nr,0),(np.fliplr(nr),1),(np.flip(nr),2),(np.flipud(nr),2)] #sends 2d but 1 maybe?
+        PI_dct=dict(zip(ALL_MOVES, list(pi)))
+        PI_dct_modifiable=dict(zip(ALL_MOVES, list(pi)))
 
+        return_list=[]
+        for s_code in S_CODES:
+            #symmetric PI
+            for move in ALL_MOVES:
+                corresp_move=SYMMETRY_MOVES_DCT[s_code][move]
+                val=PI_dct[move]
+                PI_dct_modifiable[corresp_move]=val
+            PI_symmetry=np.array(list(PI_dct_modifiable.values()))
+            #symmetric board
+            brd_array=board.board_array 
+            arr=brd_array
+            arr=np.shape(N_ROWS,N_COLUMNS)
+            if 'u' in s_code:
+                arr=np.flipud(a)
+            arr=rotate(arr,angle=int(s_code.split('_')[-1]))
+            flat_symmetry=arr.flatten()
+            board_symmetry=np.concatenate(flat_symmetry,N_INTERSECTIONS*[board.phase])
+            return_list.append((flat_symmetry,PI_symmetry))
+
+        return return_list
+        
     def stringRepresentation(self, board):
         """
         Input:
@@ -134,4 +189,4 @@ class Game():
             boardString: a quick conversion of board to a string format.
                          Required by MCTS for hashing.
         """
-        return board.position_string
+        return board.board_string
