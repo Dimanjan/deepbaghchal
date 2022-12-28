@@ -7,6 +7,7 @@ Previous publicly available works on similar project such as https://github.com/
 # Folders
 # game 
 board logic - rules of the game
+
 GUI - a GUI for BaghChal using PyGame library
 
 # nnet
