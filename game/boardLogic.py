@@ -216,7 +216,7 @@ class Board:
                 self.thrice_repetition = False #for both 3 and 2
 
     def stringify_position(self):
-        return ''.join(str(i) for i in list(self.board_array))+board.phase+board.turn
+        return ''.join(str(i) for i in list(self.board_array))+str(self.phase)+str(self.turn)
         
     def put_bagh(self,square):
         self.board_array[square]=BAGH_NUMBER
