@@ -9,33 +9,45 @@ class MCTS:
     def search(self):
         start_time = time.time()
         root = Node(None, 1)
-        print('t')
 
         while time.time() - start_time < self.timeout:
             node = root
             brd_copy = self.brd.clone()
+            print('cloned')
 
             # Selection
             while not node.is_leaf():
+                print('selection')
+            
+
                 node = node.select_child()
                 brd_copy.make_move(node.move)
 
-                if brd_copy.is_game_over():
+                if brd_copy.game_end:
                     break
 
             # Expansion
-            if not brd_copy.is_game_over():
+            if not brd_copy.game_end:
+                print('expansion')
                 node.expand(brd_copy)
+                print('expanded')
+
                 node = node.select_child()
+                print('child selected')
+
                 brd_copy.make_move(node.move)
 
             # Simulation
-            while not brd_copy.is_game_over():
-                brd_copy.make_move(random.choice(brd_copy.list_of_legal_moves()))
+            while not brd_copy.game_end:
+                print('simulation')
+
+                brd_copy.make_move(random.choice(brd_copy.legal_moves))
 
             # Backpropagation
             while node is not None:
-                result = brd_copy.result()
+                print('backpropagation')
+
+                result = brd_copy.victor
                 node.update_stats(result)
                 node = node.parent
 
@@ -43,6 +55,7 @@ class MCTS:
         best_move = root.most_visited_child().move
         return best_move
 
+from math import log, sqrt
 class Node:
     def __init__(self, parent, move=None):
         self.parent = parent
@@ -56,15 +69,18 @@ class Node:
 
     def select_child(self):
         total_visits = sum(child.visits for child in self.children)
-        exploration_constant = 1.0 / (2 * log(total_visits + 1))
+        print('total_visits',total_visits)
+
+        exploration_constant = 1.0 / (2 * log(total_visits + 1+ 1e-10))
 
         def uct(node):
-            return node.wins / node.visits + exploration_constant * sqrt(log(total_visits) / node.visits)
+            print(log(total_visits) , (node.visits + 1e-10))
+            return node.wins / (node.visits + 1e-10) + exploration_constant * sqrt(log(total_visits) / (node.visits + 1e-10))
 
         return max(self.children, key=uct)
 
     def expand(self, brd):
-        for move in brd.list_of_legal_moves():
+        for move in brd.legal_moves:
             self.children.append(Node(self, move))
 
     def update_stats(self, result):
@@ -92,7 +108,9 @@ while not brd.game_end and not brd.draw:
         print('goat turn')
         # Goat's turn
         #move = input("Enter your move (format: 'row col'): ")
+        print('searching on mcts')
         move = mcts.search()
+        
         brd.make_move(move)
 
 result = brd.victor

@@ -141,6 +141,9 @@ ALL_MOVES=['G00','G01', 'G02', 'G03','G04', 'G05', 'G06', 'G07', 'G08', 'G09', '
        'nomovebagh']
 
 import numpy as np
+import copy 
+
+
 class Board:
     def __init__(self):
         self.board_array=np.array([EMPTY_NUMBER]*TOTAL_INTERSECTIONS)
@@ -346,3 +349,7 @@ class Board:
 
         self.history['positions'].remove(self.position_string)
         self.position_string = self.stringify_position() #revert to previous string
+
+    def clone(self):
+        return copy.deepcopy(self)
+
