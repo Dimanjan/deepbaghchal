@@ -2,13 +2,15 @@ import random
 import time
 
 class MCTS:
-    def __init__(self, brd, timeout=1.0):
+    def __init__(self, brd, timeout=3.0):
         self.brd = brd
         self.timeout = timeout
 
     def search(self):
         start_time = time.time()
         root = Node(None, 1)
+        print('t')
+
         while time.time() - start_time < self.timeout:
             node = root
             brd_copy = self.brd.clone()
@@ -76,18 +78,21 @@ import  sys
 sys.path.append('..')
 from game.boardLogic import *
 
-from game.boardLogic import *
 brd = Board() # create an instance of the board game
 mcts = MCTS(brd) # create an instance of the MCTS algorithm
 
-while not brd.game_end and not brd.is_draw:
-    if brd.current_player() == "Bagh":
+while not brd.game_end and not brd.draw:
+    if brd.turn == BAGH_NUMBER:
+        print('bagh turn')
+
         # Bagh's turn
         move = mcts.search()
         brd.make_move(move)
     else:
+        print('goat turn')
         # Goat's turn
-        move = input("Enter your move (format: 'row col'): ")
+        #move = input("Enter your move (format: 'row col'): ")
+        move = mcts.search()
         brd.make_move(move)
 
 result = brd.victor
