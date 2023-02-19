@@ -9,11 +9,11 @@ TOTAL_GOATS=20
 
 # Letter Notations
 BAGH_LETTER='B'
-GOAT_LETTER='G'
+GOAT_LETTER='g'
 
 # Numeric Notations
 GOAT_NUMBER=1
-BAGH_NUMBER=-GOAT_NUMBER
+BAGH_NUMBER= -GOAT_NUMBER
 EMPTY_NUMBER=0
 
 # Initial baghs squares
@@ -21,7 +21,7 @@ INITIAL_BAGH_SQ=[0,4,20,24]
 
 #phases
 PHASES={
-    'PLACEMENT':-1,
+    'PLACEMENT':-1, # inside board logic, it is also referred to as 0 (for stringify purpose)
     'MOVEMENT':1
 }
 PLACEMENT = TOTAL_GOATS * 2 -1
@@ -218,9 +218,29 @@ class Board:
                 self.repetitions[self.position_string] -= 1                
                 self.thrice_repetition = False #for both 3 and 2
 
+    
     def stringify_position(self):
-        return ''.join(str(i) for i in list(self.board_array))+str(self.phase)+str(self.turn)
-        
+        returnStr=''
+        for i in list(self.board_array):
+            
+            if i == BAGH_NUMBER:
+                returnStr+=BAGH_LETTER
+            elif i == GOAT_NUMBER:
+                returnStr+=GOAT_LETTER
+            else: 
+                returnStr+='0'
+        if self.phase == -1:
+            returnStr+='0'
+        else:
+            returnStr+='1'
+
+        if self.turn == BAGH_NUMBER:
+            returnStr+=BAGH_LETTER
+        else:
+            returnStr+=GOAT_LETTER
+
+        return returnStr
+            
     def put_bagh(self,square):
         self.board_array[square]=BAGH_NUMBER
         self.bagh_occupancy.append(square)
