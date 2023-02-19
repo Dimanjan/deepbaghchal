@@ -373,3 +373,40 @@ class Board:
     def clone(self):
         return copy.deepcopy(self)
 
+    def reset(self):
+        self.board_array=np.array([EMPTY_NUMBER]*TOTAL_INTERSECTIONS)
+        self.bagh_occupancy=[0,4,20,24]
+        self.goat_occupancy=[]
+
+        # initialize baghs
+        for square in [0,4,20,24]:
+            self.board_array[square]=BAGH_NUMBER
+
+        self.captured_goats=0
+        self.turn=GOAT_NUMBER
+
+        self.phase=PHASES['PLACEMENT']
+        self.position_string = self.stringify_position()
+
+        self.history={
+            'positions':[],
+            'pgn':[]
+        }
+        
+
+        self.repetitions={}
+        self.thrice_repetition=False
+
+        self.draw = False
+        self.victor=None
+        self.game_end=False
+
+        self.bagh_moves=self.legal_bagh_moves()
+        self.goat_moves=self.legal_goat_moves()
+        self.legal_moves=[]
+        self.legal_moves_function()
+
+        self.action_space=ALL_MOVES
+
+
+
