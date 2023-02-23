@@ -22,26 +22,28 @@ def pos_parse(pos):
         turn=np.zeros(25)
     else:
         turn=np.ones(25)
-
-    return np.concatenate([bagh,goat,turn,phase])
+    
+    concatenated=np.concatenate([bagh,goat,turn,phase])
+    return concatenated
 
 
 def combine_pos(lst):
     my_arr=pos_parse(lst[0])
-    for pos in lst:
+    for pos in lst[1:]:
         pos_arr=pos_parse(pos)
         my_arr=np.vstack((my_arr, pos_arr))
-    my_arr = np.append(my_arr, np.expand_dims(np.ones(len(my_arr)), axis=1), axis=1)
+    return my_arr
 
 def prepare_data():
     bagh=reader('baghWinList')
-    bagh_arr=combine_pos(bagh)
+    bagh_arr=combine_pos(bagh[:7000])
+    print(bagh_arr.shape)
     bagh_arr = np.append(bagh_arr, np.expand_dims(np.zeros(len(bagh_arr)), axis=1), axis=1)
+    print(bagh_arr.shape)
 
     goat=reader('goatWinList')
-    goat_arr=combine_pos(goat)
+    goat_arr=combine_pos(goat[:7000])
     goat_arr = np.append(goat_arr, np.expand_dims(np.ones(len(goat_arr)), axis=1), axis=1)
-
 
     #draw=reader('drawList')
 
