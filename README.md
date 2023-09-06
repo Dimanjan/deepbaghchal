@@ -10,6 +10,9 @@ board logic - rules of the game
 
 GUI - a GUI for BaghChal using PyGame library
 
+![Bagchal GUI]('game\board_gui\img\gui.png')
+
+
 # nnet
 Development of Neural Network
 
