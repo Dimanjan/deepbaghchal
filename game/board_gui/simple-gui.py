@@ -37,6 +37,8 @@ def updateDetails():
             winner='BAGH'
         elif brd.victor==GOAT_NUMBER:
             winner='goat'
+        elif brd.draw:
+            winner = 'Draw'
         game_end_text = game_end_font.render('Winner: '+ winner, False, (0, 0, 0))
         GAME["screen"].blit(game_end_text, (SCREEN_WIDTH*0.3,SCREEN_HEIGHT*0.4))
 
@@ -85,10 +87,13 @@ def eventHandler():
             if event.button == 1:
                 mx,my=pygame.mouse.get_pos()
                 index=xyToInd(mx,my)
+                
                 if index in brd.bagh_occupancy and brd.turn==BAGH_NUMBER:
                     dragDict["piece"]=BAGH_NUMBER
                     dragDict["drag"]=True
                     dragDict["index"]=index
+                
+
                 if index in brd.goat_occupancy and brd.turn==GOAT_NUMBER and brd.phase == PHASES["MOVEMENT"]:
                     dragDict["piece"]=GOAT_NUMBER
                     dragDict["drag"]=True
@@ -107,6 +112,7 @@ def eventHandler():
             dragDict["drag"]=False
             dragDict["index"]=100
 
+            
             dropFromRemainingGoats()
 
         

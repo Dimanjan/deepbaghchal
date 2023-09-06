@@ -10,6 +10,7 @@ TOTAL_GOATS=20
 # Letter Notations
 BAGH_LETTER='B'
 GOAT_LETTER='g'
+NONE_LETTER='n'
 
 # Numeric Notations
 GOAT_NUMBER=1
@@ -21,7 +22,7 @@ INITIAL_BAGH_SQ=[0,4,20,24]
 
 #phases
 PHASES={
-    'PLACEMENT':-1, # inside board logic, it is also referred to as 0 (for stringify purpose)
+    'PLACEMENT':-1, # inside board logic, it is also referred to as 0 (for stringify purpose), need to work on making this 0
     'MOVEMENT':1
 }
 PLACEMENT = TOTAL_GOATS * 2 -1
@@ -88,25 +89,25 @@ def jump_connections():
 CONNECTIONS=connections()
 JUMP_CONNECTIONS=jump_connections()
 
-ALL_MOVES=['G00','G01', 'G02', 'G03','G04', 'G05', 'G06', 'G07', 'G08', 'G09', 'G10',
-       'G11', 'G12', 'G13', 'G14', 'G15', 'G16', 'G17', 'G18', 'G19','G20',
-       'G21', 'G22', 'G23','G24',
-       'G0500', 'G0100', 'G0600', 'G0601', 'G0001', 'G0201', 'G0702',
-       'G0102', 'G0302', 'G0802', 'G0602', 'G0803', 'G0203', 'G0403',
-       'G0904', 'G0304', 'G0804', 'G0005', 'G1005', 'G0605', 'G0106',
-       'G1106', 'G0506', 'G0706', 'G0006', 'G1206', 'G0206', 'G1006',
-       'G0207', 'G1207', 'G0607', 'G0807', 'G0308', 'G1308', 'G0708',
-       'G0908', 'G0208', 'G1408', 'G0408', 'G1208', 'G0409', 'G1409',
-       'G0809', 'G0510', 'G1510', 'G1110', 'G1610', 'G0610', 'G0611',
-       'G1611', 'G1011', 'G1211', 'G0712', 'G1712', 'G1112', 'G1312',
-       'G0612', 'G1812', 'G0812', 'G1612', 'G0813', 'G1813', 'G1213',
-       'G1413', 'G0914', 'G1914', 'G1314', 'G0814', 'G1814', 'G1015',
-       'G2015', 'G1615', 'G1116', 'G2116', 'G1516', 'G1716', 'G1016',
-       'G2216', 'G1216', 'G2016', 'G1217', 'G2217', 'G1617', 'G1817',
-       'G1318', 'G2318', 'G1718', 'G1918', 'G1218', 'G2418', 'G1418',
-       'G2218', 'G1419', 'G2419', 'G1819', 'G1520', 'G2120', 'G1620',
-       'G1621', 'G2021', 'G2221', 'G1722', 'G2122', 'G2322', 'G1622',
-       'G1822', 'G1823', 'G2223', 'G2423', 'G1924', 'G2324', 'G1824',
+ALL_MOVES=['g00','g01', 'g02', 'g03','g04', 'g05', 'g06', 'g07', 'g08', 'g09', 'g10',
+       'g11', 'g12', 'g13', 'g14', 'g15', 'g16', 'g17', 'g18', 'g19','g20',
+       'g21', 'g22', 'g23','g24',
+       'g0500', 'g0100', 'g0600', 'g0601', 'g0001', 'g0201', 'g0702',
+       'g0102', 'g0302', 'g0802', 'g0602', 'g0803', 'g0203', 'g0403',
+       'g0904', 'g0304', 'g0804', 'g0005', 'g1005', 'g0605', 'g0106',
+       'g1106', 'g0506', 'g0706', 'g0006', 'g1206', 'g0206', 'g1006',
+       'g0207', 'g1207', 'g0607', 'g0807', 'g0308', 'g1308', 'g0708',
+       'g0908', 'g0208', 'g1408', 'g0408', 'g1208', 'g0409', 'g1409',
+       'g0809', 'g0510', 'g1510', 'g1110', 'g1610', 'g0610', 'g0611',
+       'g1611', 'g1011', 'g1211', 'g0712', 'g1712', 'g1112', 'g1312',
+       'g0612', 'g1812', 'g0812', 'g1612', 'g0813', 'g1813', 'g1213',
+       'g1413', 'g0914', 'g1914', 'g1314', 'g0814', 'g1814', 'g1015',
+       'g2015', 'g1615', 'g1116', 'g2116', 'g1516', 'g1716', 'g1016',
+       'g2216', 'g1216', 'g2016', 'g1217', 'g2217', 'g1617', 'g1817',
+       'g1318', 'g2318', 'g1718', 'g1918', 'g1218', 'g2418', 'g1418',
+       'g2218', 'g1419', 'g2419', 'g1819', 'g1520', 'g2120', 'g1620',
+       'g1621', 'g2021', 'g2221', 'g1722', 'g2122', 'g2322', 'g1622',
+       'g1822', 'g1823', 'g2223', 'g2423', 'g1924', 'g2324', 'g1824',
        'nomovegoat',
        'B0500', 'B0100', 'B0600', 'B0601', 'B0001', 'B0201', 'B0702',
        'B0102', 'B0302', 'B0802', 'B0602', 'B0803', 'B0203', 'B0403',
@@ -182,15 +183,37 @@ class Board:
 
         self.action_space=ALL_MOVES
 
+    def parse_position(self,pos): #B000Bg0000g00000B0000000B0g
+        self.reset()
+        self.board_array=np.array([EMPTY_NUMBER]*TOTAL_INTERSECTIONS)
+        self.bagh_occupancy=[]
+        
+        for i in range(25):
+            if pos[i]==BAGH_LETTER:
+                self.board_array[i]=BAGH_NUMBER
+                self.bagh_occupancy.append(i)
+            elif pos[i]==GOAT_LETTER:
+                self.board_array[i]=GOAT_NUMBER
+                self.goat_occupancy.append(i)
 
+        self.phase=PHASES['MOVEMENT'] if int(pos[25])==PHASES['MOVEMENT'] else PHASES['PLACEMENT']
+        self.captured_goats=int(pos[26])
+        if pos[27]==BAGH_LETTER:
+            self.turn=BAGH_NUMBER
+        else:
+            self.turn=GOAT_NUMBER
+
+        self.bagh_moves=self.legal_bagh_moves()
+        self.goat_moves=self.legal_goat_moves()
+        self.legal_moves=[]
+        self.legal_moves_function()
+            
 
     def update_phase(self):
         if len(self.history['pgn']) >= PLACEMENT:
             self.phase = PHASES['MOVEMENT']
-            #self.board_array[TOTAL_INTERSECTIONS:]=PHASES['MOVEMENT']
         else:
             self.phase = PHASES['PLACEMENT']
-            #self.board_array[TOTAL_INTERSECTIONS:]=PHASES['PLACEMENT']
 
         
 
@@ -229,10 +252,9 @@ class Board:
                 returnStr+=GOAT_LETTER
             else: 
                 returnStr+='0'
-        if self.phase == -1:
-            returnStr+='0'
-        else:
-            returnStr+='1'
+        
+        returnStr+=str(self.phase)
+        returnStr+=str(self.captured_goats)
 
         if self.turn == BAGH_NUMBER:
             returnStr+=BAGH_LETTER
@@ -261,27 +283,27 @@ class Board:
         return_l =[]    
         if self.turn==GOAT_NUMBER:          
           if self.phase == PHASES['PLACEMENT']:            
-              for square in range(len(self.board_array)):
-                  if self.board_array[square] == EMPTY_NUMBER:
-                      return_l.append(GOAT_LETTER+f"{square:02d}")            
+                for square in range(len(self.board_array)):
+                    if self.board_array[square] == EMPTY_NUMBER:
+                        return_l.append(GOAT_LETTER+f"{square:02d}")            
           else:
-              for square in self.goat_occupancy:
-                  for connection in CONNECTIONS[square]:
-                      if self.board_array[connection] == EMPTY_NUMBER:
-                          return_l.append(GOAT_LETTER+f"{connection:02d}"+f"{square:02d}")
+                for square in self.goat_occupancy:
+                        for connection in CONNECTIONS[square]:
+                            if self.board_array[connection] == EMPTY_NUMBER:
+                                return_l.append(GOAT_LETTER+f"{connection:02d}"+f"{square:02d}")
         self.goat_moves=return_l
         return return_l
 
     def legal_bagh_moves(self):
         return_l=[]
         if self.turn==BAGH_NUMBER:
-          for square in self.bagh_occupancy:
-              for connection in CONNECTIONS[square]:
-                  if self.board_array[connection] == EMPTY_NUMBER:
-                      return_l.append(BAGH_LETTER+f"{connection:02d}"+f"{square:02d}")                    
-              for jump_connection in JUMP_CONNECTIONS[square]:
-                  if self.board_array[jump_connection['jump_destination']] == EMPTY_NUMBER and self.board_array[jump_connection['jump_over']] == GOAT_NUMBER:
-                      return_l.append(BAGH_LETTER+f"{jump_connection['jump_destination']:02d}"+f"{square:02d}"+f"{jump_connection['jump_over']:02d}")                    
+            for square in self.bagh_occupancy:
+                for connection in CONNECTIONS[square]:
+                    if self.board_array[connection] == EMPTY_NUMBER:
+                        return_l.append(BAGH_LETTER+f"{connection:02d}"+f"{square:02d}")                    
+                for jump_connection in JUMP_CONNECTIONS[square]:
+                    if self.board_array[jump_connection['jump_destination']] == EMPTY_NUMBER and self.board_array[jump_connection['jump_over']] == GOAT_NUMBER:
+                        return_l.append(BAGH_LETTER+f"{jump_connection['jump_destination']:02d}"+f"{square:02d}"+f"{jump_connection['jump_over']:02d}")                    
         self.bagh_moves=return_l
         return return_l
 

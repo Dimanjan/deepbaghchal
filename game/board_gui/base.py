@@ -61,7 +61,7 @@ baghHeight=boardHeight/(N_COLUMNS+1)
 goatWidth=baghWidth*0.7
 goatHeight=baghHeight*0.7
 
-GAME={
+GAME = {
     'running':True,
     'moveBackX':SCREEN_WIDTH*0.5,
     'moveBackY':SCREEN_HEIGHT*0.02,
@@ -170,13 +170,16 @@ def dragFromRemainingGoats():
         goat.update(mx,my)
 
 def dropFromRemainingGoats():
+    
     if REM_GOAT['drag']:
+        
         mx,my=pygame.mouse.get_pos()
         toSq=xyToInd(mx,my)
         if toSq<0 or toSq>24: #check what happens if outside board, we should prob break if toSq< 0 or > 24
             return
         toSq=f"{toSq:02d}"
-        move_code='G'+toSq
+        move_code=GOAT_LETTER+toSq
+        
         if move_code in brd.legal_moves:
             brd.make_move(move_code)
         REM_GOAT['drag']=False

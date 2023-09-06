@@ -1,7 +1,7 @@
+
 '''
-This code is incomplete:
-- position parser needs to be built.
-- brd's variables must be properly given values
+B000Bg0000g00000B0000000B01g
+
 '''
 
 from base import *
@@ -13,12 +13,7 @@ def position_input_with_tkinter():
     POSITION = simpledialog.askstring(title="POSITION Input", prompt="Paste your position : e.g. \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t ")
     return POSITION
 GAME["position"]=position_input_with_tkinter()
-import ast
-GAME["position"]=ast.literal_eval(GAME['position'])
-
-print(GAME['position'])
-for move in GAME['position']:
-    brd.make_move(move)
+brd.parse_position(GAME["position"])
 
 
 def updateDetails():
@@ -30,7 +25,7 @@ def updateDetails():
 
     font_size=int(SCREEN_HEIGHT*0.015)
     my_font = pygame.font.SysFont('Comic Sans MS', font_size)
-    #position
+    #pgn
     count=0
     for pgn in brd.history["pgn"]:
         text_surface = my_font.render(pgn, False, (0, 0, 0))
@@ -94,23 +89,6 @@ def screenDraw():
     updateDetails()
     dragFromRemainingGoats()
 
-# import numpy as np
-
-# import random
-# def random_chooser(lst):
-#   return random.choice(lst)
-
-# def simulate_game(n_moves):
-#     count=0
-#     while n_moves>count:
-#         count+=1
-#         available_moves=brd.legal_moves
-#         choosen_move=random_chooser(available_moves)
-#         brd.make_move(choosen_move)
-
-#         if brd.game_end==True:
-#             return np.array(brd.victor),np.array(brd.history['positions'])
-
 
 
 def eventHandler():
@@ -149,7 +127,6 @@ def eventHandler():
             dropFromRemainingGoats()
 
 def main():
-    #simulate_game(20)
     
     clock = pygame.time.Clock()
     while GAME["running"]:

@@ -4,14 +4,14 @@ def pgn_input_with_tkinter():
     from tkinter import simpledialog
     ROOT = tk.Tk()
     ROOT.withdraw()
-    PGN = simpledialog.askstring(title="PGN Input", prompt="Paste your pgn (comma separated and inside big brackets): e.g. ['G13', 'B0804', 'G16', 'B0600', 'G07', 'B0506', 'G03', 'B2324', 'G10', 'B150510', 'G24', 'B060807', 'G02', 'B0506', 'G10', 'B2120', 'G22', 'B112116'] ")
+    PGN = simpledialog.askstring(title="PGN Input", prompt="Paste your pgn (comma separated and inside big brackets): e.g. 'g13', 'B0804', 'g16', 'B0600', 'g07', 'B0506', 'g03', 'B2324', 'g10', 'B150510', 'g24', 'B060807', 'g02', 'B0506', 'g10', 'B2120', 'g22', 'B112116' ")
     return PGN
 GAME["pgn"]=pgn_input_with_tkinter()
 import ast
 GAME["pgn"]=ast.literal_eval(GAME['pgn'])
 
-print(GAME['pgn'])
-#GAME["pgn"]=['G13', 'B0804', 'G16', 'B0600', 'G07', 'B0506', 'G03', 'B2324', 'G10', 'B150510', 'G24', 'B060807', 'G02', 'B0506', 'G10', 'B2120', 'G22', 'B112116', 'G07', 'B0605', 'G08', 'B0006', 'G16', 'B1211', 'G01', 'B1112', 'G04', 'B051510', 'G19', 'B0605', 'G17', 'B1011', 'G09', 'B1823', 'G15', 'B1110', 'G20', 'B211116']
+#GAME["pgn"]=['g13', 'B0804', 'g16', 'B0600', 'g07', 'B0506', 'g03', 'B2324', 'g10', 'B150510', 'g24', 'B060807', 'g02', 'B0506', 'g10', 'B2120', 'g22', 'B112116', 'g07', 'B0605', 'g08', 'B0006', 'g16', 'B1211', 'g01', 'B1112', 'g04', 'B051510', 'g19', 'B0605', 'g17', 'B1011', 'g09']
+
 for move in GAME['pgn']:
     brd.make_move(move)
 
